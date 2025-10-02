@@ -15,7 +15,7 @@ public class CompositeRoutes extends RouteBuilder {
 
     @Override
     public void configure() {
-        // --- Error mapping (basic) ---
+        // --- Error mapping ---
         onException(IllegalArgumentException.class)
                 .handled(true)
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400))

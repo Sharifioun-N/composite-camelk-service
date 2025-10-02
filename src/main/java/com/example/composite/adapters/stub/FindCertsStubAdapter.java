@@ -10,7 +10,7 @@ import java.util.List;
 public class FindCertsStubAdapter implements FindCertsPort {
     @Override
     public List<Certificate> findCerts(String username, boolean active) {
-        // Just deterministic fake data so we can exercise orchestration
+        // Deterministic fake data so we can exercise orchestration
         List<Certificate> list = new ArrayList<>();
         if (active) {
             list.add(new Certificate(username + "-VAL-001", "CN=" + username,
