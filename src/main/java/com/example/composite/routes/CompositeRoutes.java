@@ -8,6 +8,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.BindToRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,13 @@ public class CompositeRoutes extends RouteBuilder {
     public FindCertsPort findCertsPort() {
         // Default to stub for POC; replace with CXF adapter when available
         return new com.example.composite.adapters.stub.FindCertsStubAdapter();
+    }
+
+    @BindToRegistry("jsonObjectMapper")
+    public ObjectMapper jsonObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
     }
 
     @Override
@@ -47,7 +56,8 @@ public class CompositeRoutes extends RouteBuilder {
             .host(resolvedHost)
             .port(Integer.parseInt(resolvedPort))
             .bindingMode(RestBindingMode.json)
-            .dataFormatProperty("prettyPrint", "true");
+            .dataFormatProperty("prettyPrint", "true")
+            .dataFormatProperty("objectMapper", "#jsonObjectMapper");
 
         // --- REST endpoint (POST /composite/user-certificates) ---
         rest("/composite")
