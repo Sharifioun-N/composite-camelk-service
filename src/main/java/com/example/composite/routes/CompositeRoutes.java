@@ -7,11 +7,24 @@ import com.example.composite.ports.FindUserPort;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.BindToRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CompositeRoutes extends RouteBuilder {
+
+    @BindToRegistry("findUserPort")
+    public FindUserPort findUserPort() {
+        // Default to stub for POC; replace with CXF adapter when available
+        return new com.example.composite.adapters.stub.FindUserStubAdapter();
+    }
+
+    @BindToRegistry("findCertsPort")
+    public FindCertsPort findCertsPort() {
+        // Default to stub for POC; replace with CXF adapter when available
+        return new com.example.composite.adapters.stub.FindCertsStubAdapter();
+    }
 
     @Override
     public void configure() {
@@ -24,14 +37,15 @@ public class CompositeRoutes extends RouteBuilder {
 
         // --- REST config: explicit, programmatic host/port (reads placeholders) ---
         // Read properties (with defaults) — placeholders are resolved by Camel
-        String host = "{{app.http.host}}";
-        String port = "{{app.http.port}}";
+        String resolvedHost = getContext().resolvePropertyPlaceholders("{{app.http.host}}");
+        String resolvedPort = getContext().resolvePropertyPlaceholders("{{app.http.port}}");
+        String restComponent = getContext().resolvePropertyPlaceholders("{{rest.component}}");
 
-        // IMPORTANT: Use the component name you want (undertow is stable locally)
+        // Component is configurable to allow local runs (undertow) and Camel K (platform-http)
         restConfiguration()
-            .component("undertow")
-            .host(host)
-            .port(Integer.parseInt(port))   // parse placeholder to int
+            .component(restComponent)
+            .host(resolvedHost)
+            .port(Integer.parseInt(resolvedPort))
             .bindingMode(RestBindingMode.json)
             .dataFormatProperty("prettyPrint", "true");
 

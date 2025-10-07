@@ -14,9 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <camel.version>4.7.0</camel.version>
-            <maven.compiler.source>21</maven.compiler.source>
-            <maven.compiler.target>21</maven.compiler.target>
-            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
@@ -38,7 +35,7 @@
         <artifactId>camel-main</artifactId>
     </dependency>
 
-    <!-- REST endpoint over embedded HTTP -->
+    <!-- REST endpoint over platform-http (Camel K friendly) -->
     <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-rest</artifactId>
@@ -48,23 +45,19 @@
         <artifactId>camel-platform-http</artifactId>
     </dependency>
 
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-undertow</artifactId>
-        </dependency>
-
-
-        <!-- Platform HTTP engine for local runs -->
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-platform-http-vertx</artifactId>
-        </dependency>
+    <!-- Undertow for local runs when rest.component=undertow -->
+    <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-undertow</artifactId>
+    </dependency>
 
     <!-- JSON binding -->
     <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-jackson</artifactId>
     </dependency>
+
+        <!-- SOAP (future): add camel-cxf/camel-cxf-soap when generating client from WSDL -->
 
         <!-- Simple console logging -->
         <dependency>
