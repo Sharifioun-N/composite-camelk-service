@@ -16,16 +16,24 @@ import java.util.List;
 
 public class CompositeRoutes extends RouteBuilder {
 
-    @BindToRegistry("findUserPort")
-    public FindUserPort findUserPort() {
-        // Default to stub for POC; replace with CXF adapter when available
+    @BindToRegistry("findUserPortStub")
+    public FindUserPort findUserPortStub() {
         return new com.example.composite.adapters.stub.FindUserStubAdapter();
     }
 
-    @BindToRegistry("findCertsPort")
-    public FindCertsPort findCertsPort() {
-        // Default to stub for POC; replace with CXF adapter when available
+    @BindToRegistry("findCertsPortStub")
+    public FindCertsPort findCertsPortStub() {
         return new com.example.composite.adapters.stub.FindCertsStubAdapter();
+    }
+
+    @BindToRegistry("findUserPortCxf")
+    public FindUserPort findUserPortCxf() {
+        return new com.example.composite.adapters.cxf.FindUserCxfAdapter();
+    }
+
+    @BindToRegistry("findCertsPortCxf")
+    public FindCertsPort findCertsPortCxf() {
+        return new com.example.composite.adapters.cxf.FindCertsCxfAdapter();
     }
 
     @BindToRegistry("jsonObjectMapper")
@@ -81,10 +89,13 @@ public class CompositeRoutes extends RouteBuilder {
                 int matchType = Integer.parseInt(mt);
                 int matchWith = Integer.parseInt(mw);
 
+                String mode = exchange.getContext().resolvePropertyPlaceholders("{{composite.adapter.mode}}");
+                boolean useCxf = "cxf".equalsIgnoreCase(mode);
+
                 FindUserPort findUser = exchange.getContext().getRegistry()
-                        .lookupByNameAndType("findUserPort", FindUserPort.class);
+                        .lookupByNameAndType(useCxf ? "findUserPortCxf" : "findUserPortStub", FindUserPort.class);
                 FindCertsPort findCerts = exchange.getContext().getRegistry()
-                        .lookupByNameAndType("findCertsPort", FindCertsPort.class);
+                        .lookupByNameAndType(useCxf ? "findCertsPortCxf" : "findCertsPortStub", FindCertsPort.class);
 
                 List<String> usernames = findUser.findUserBySerial(req.serialNumber(), matchType, matchWith);
 
