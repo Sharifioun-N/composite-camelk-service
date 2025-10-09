@@ -45,14 +45,14 @@ public class CompositeRoutes extends RouteBuilder {
 
     @Override
     public void configure() {
-        // --- Error mapping ---
+        // Error mapping
         onException(IllegalArgumentException.class)
                 .handled(true)
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .setBody().simple("{\"error\":\"${exception.message}\"}");
 
-        // --- REST config: explicit, programmatic host/port (reads placeholders) ---
+        // REST config: explicit, programmatic host/port (reads placeholders)
         // Read properties (with defaults) — placeholders are resolved by Camel
         String resolvedHost = getContext().resolvePropertyPlaceholders("{{app.http.host}}");
         String resolvedPort = getContext().resolvePropertyPlaceholders("{{app.http.port}}");
@@ -67,14 +67,14 @@ public class CompositeRoutes extends RouteBuilder {
             .dataFormatProperty("prettyPrint", "true")
             .dataFormatProperty("objectMapper", "#jsonObjectMapper");
 
-        // --- REST endpoint (POST /composite/user-certificates) ---
+        // REST endpoint (POST /composite/user-certificates)
         rest("/composite")
                 .post("/user-certificates")
                 .consumes("application/json").produces("application/json")
                 .type(UserCertRequest.class).outType(UserCertResponse.class)
                 .to("direct:compositeUserCerts");
 
-        // --- Route implementation (sequential for now; EIPs in the next step) ---
+        // Route implementation (sequential for now; EIPs in the next step)
         from("direct:compositeUserCerts")
             .routeId("composite-user-certs")
             .log("Received composite request")
